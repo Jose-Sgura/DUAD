@@ -1,0 +1,87 @@
+1. Cree un algoritmo para ver un video en Youtube. Sea lo más especifico posible.
+    
+    Respuesta: 
+    
+    Inicio
+    
+    1. Encender la computadora
+        1. Digitar sus credenciales de ingreso
+            1. Usuario y contraseña
+            2. PIN
+            3. Huella digital 
+    2. Ir a su buscador de confianza
+        1. Digerirse a barra de tareas
+        2. Dar click sobre el icono del buscador
+            1. mozila
+            2. Firefox
+            3. chrome
+            4. Explorer
+    3. Digitar enlace www.youtube.com
+        1. Click sobre la barra de búsqueda de Youtube
+            1. Digitar nombre de video
+                1. Dar click sobre el video solicitado
+        2. Ajustar el tamaño del video
+            1. FullScreen o normal
+        
+        4. Ver video
+        
+        fin
+        
+2. Cree un algoritmo que describa su rutina diaria. Use condiciones, condiciones multiples y ciclos.
+
+Respuesta:
+
+Inicio
+
+1.Levantarme
+
+2. ir al baño
+
+3.si tiene mal aliento y no se ha bañado
+
+1. Asearse 
+
+4.sino, si ya se bañó en la noche anterior
+
+1. Solo lavar dientes
+
+5.sino, si le agarró tarde o tiene pereza 
+
+1. alistarse sin bañar
+
+6.Desayunar
+
+1. ir a la refri 
+2. tomar el desayuno ya preparado
+3. comer
+
+7.Lavar platos
+
+8.Mientras que el plato este sucio 
+
+1. lavarlo 
+
+9.ir [al](http://6.al) gym
+
+1. hacer pecho
+    1. Por cada serie:
+        1. tomar peso máximo
+        2. hacer buena técnica
+        3. tensión mecánica
+        4. llegar al fallo
+            1. descansar 3 minutos
+        5. Guardar peso
+2. ir al trabajo
+3. Mientras se cumpla horario laboral 
+    1. trabajar
+4. cenar
+5. si tiene novia 
+    1. va a cenar
+6. sino, si amigo
+    1. Ir por unas cervezas
+7. sino:
+    1. Pedir comida para llevar
+
+9.dormir
+
+Fins

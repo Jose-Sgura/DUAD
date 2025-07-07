@@ -1,0 +1,250 @@
+1. Cree un pseudocódigo que le pida un precio de producto al usuario, calcule su descuento y muestre el precio final tomando en cuenta que:
+    1. Si el precio es menor a 100, el descuento es del 2%.
+    2. Si el precio es mayor o igual a 100, el descuento es del 10%.
+    3. *Ejemplos*:
+        1. 120 → 108
+        2. 40 → 39.2
+
+Inicio
+
+Definir precio
+
+Definir descuento
+
+Definir precio_final
+
+Mostrar “Ingrese precio de producto”
+
+Pedir precio
+
+Si (precio< 100) entonces
+
+Descuento=precio*0.02
+
+precio_final=Descuento-precio
+
+`Sino`
+
+Si(precio>=100) entonces
+
+Descuento=precio*0.10
+
+precio_final=Descuento-precio
+
+FinSi
+
+Mostrar” El precio de su producto sería”
+
+Mostrar precio_final
+
+Fin
+
+1. Cree un pseudocódigo que le pida un tiempo en segundos al usuario y calcule si es menor o mayor a 10 minutos. Si es menor, muestre cuantos segundos faltarían para llegar a 10 minutos. Si es mayor, muestre “*Mayor*”.
+    1. *Ejemplos*:
+        1. 1040 → Mayor
+        2. 140 → 460
+        3. 599 → 1
+
+Inicio
+
+Definir segundos
+
+Definir remanente
+
+Si(segundos<600) entonces
+
+remanente=segundos-600
+
+Mostrar “Los segundos son menores a 10 minutos”
+
+Mostrar ”Para alcanzar 10 minutos faltan”
+
+Mostrar remanente
+
+`Sino`
+
+Mostrar “Los segundos son mayores a 10minutos”
+
+Mostrar remanente
+
+Finsi
+
+ Fin
+
+1. Cree un algoritmo que le pida un numero al usuario, y realice una suma de cada numero del 1 hasta ese número ingresado. Luego muestre el resultado de la suma.
+    1. 3 → 6 (1 + 2 + 3)
+    2. 5 → 15 (1 + 2 + 3 + 4 + 5)
+    3. 12 → 78 (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12)
+
+Inicio
+
+Definir numero
+
+Definir contador
+
+Definir suma
+
+suma=1
+
+Mostrar “Ingrese número”
+
+Pedir numero
+
+Mientras que(suma<=numero) hacer:
+
+suma=suma+contador———>Aquí debe ser suma=suma+contador
+
+contador = contador+1——>Excelente aquí con el contador
+
+FinMientras
+
+Mostrar” El resultado sería:”
+
+Mostrar suma
+
+Fin
+
+1. Cree un algoritmo que le pida 2 números al usuario, los guarde en dos variables distintas (primero y segundo) y los ordene de menor a mayor en dichas variables.
+    1. Ejemplos:
+        1. A: 56, B: 32 → A: 32, B: 56
+        2. A: 24, B: 76 → A: 24, B: 76
+        3. A: 45, B: 12 → A: 12, B: 45
+
+Inicio
+
+Definir uno
+
+Definir dos
+
+Definir aux
+
+Mostrar” Ingrese el primer número: ”
+
+Pedir uno
+
+Mostrar “Ingrese el segundo número: ”
+
+Pedir dos
+
+Mientras que (uno < dos) hacer:
+
+Si (uno>dos) entonces:
+
+aux=uno
+
+uno=dos
+
+dos=aux
+
+Finsi
+
+Finmientras
+
+Mostrar uno
+
+Mostrar dos
+
+Fin
+
+1. Cree un algoritmo que le pida al usuario una velocidad en km/h y la convierta a m/s. Recuerda que 1 km == 1000m y 1 hora == 60 minutos * 60 segundos.
+    1. *Ejemplos*:
+        1. 73 → 20.27
+        2. 50 → 13.88
+        3. 120 → 33.33
+
+Inicio
+
+Definir km
+
+Definir metros
+
+Definir ms
+
+Definir total
+
+metros=1000
+
+segundos=3600
+
+Mostrar “Agregue los kilómetros”
+
+Pedir km
+
+ms= km*metros/segundos
+
+Mostrar “Los metros sobre segundos serian :”
+
+Mostrar ms
+
+Fin
+
+3.Cree un algoritmo que le pregunte al usuario por el sexo de 6 personas, ingresando 1 si es mujer o 2 si es hombre, y muestre al final el porcentaje de mujeres y hombres.
+
+1. *Ejemplos*:
+    1. 1, 1, 1, 2, 2, 2 → 50% mujeres y 50% hombres
+    2. 1, 1, 2, 2, 2, 2 → 33.3% mujeres y 66.6% hombres
+    3. 1, 1, 1, 1, 1, 2 → 84.4% mujeres y 16.6% hombres
+
+Inicio
+
+Definir mujer
+
+Definir hombre
+
+Definir persona
+
+Definir porcentual
+
+Definir total1
+
+Definir total2
+
+Mostrar “2 para hombre”
+
+Pedir hombre
+
+Mostrar “Al ingresar presiona 1”
+
+Pedir persona
+
+Mientras que(persona<=6) hacer:
+
+Mostrar ”Seleccione su sexo”
+
+Mostrar “1 para mujer”
+
+Pedir mujer
+
+Mostrar “2 para hombre”
+
+Pedir hombre
+
+Si (mujer==1) entonces
+
+mujer=mujer+1
+
+`Sino`
+
+Si(hombre==2)
+
+hombre=hombre+1
+
+Finsi
+
+FinMientras
+
+porcentual=mujeres+hombres
+
+total1= mujeres/porcental*100
+
+total2= hombres/porcental*100
+
+Mostrar ”El porcentaje de mujeres es: ”
+
+Mostrar total1
+
+Mostrar “El porcentaje de hombres es”
+
+Mostrar total2
+
+Fin
