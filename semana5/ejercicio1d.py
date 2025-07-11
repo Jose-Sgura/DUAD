@@ -8,50 +8,13 @@ second_list = ['casos', 'los', 'la', 'por', 'es','util']
 for index in range(len(first_list)):
     print(f'{first_list[index]} {second_list[index]}')
 
-#ejercicio2
-#Cree un programa que itere e imprima un string letra por letra de derecha a izquierda.
-
-string = 'Pizza con piña'
-
-for char in reversed(string):
-    print(char)
-
-#ejercicio3
-#Cree un programa que intercambie el primer y ultimo elemento de una lista. Debe funcionar con listas de cualquier tamaño.
-my_list = [4, 3, 6, 1, 7]
-
-if len(my_list)>=2:
-    my_list[0],my_list[-1] = my_list [-1] ,my_list[0]
-    print(f'Se intercambian elemnetos {my_list}')
-
-#ejercicio4
-#Cree un programa que elimine todos los números impares de una lista.
-
-Deleted_Odd  = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
-for index in range(len(Deleted_Odd)-1,-1,-1):
-        if Deleted_Odd[index]% 2!=0:
-            Deleted_Odd.pop(index)
 
-print(f'With no odds!{Deleted_Odd}')
 
-#ejercicio5
-#Cree un programa 
-# que le pida al usuario 10 números, y al final le muestre 
-# todos los números que ingresó, seguido del numero ingresado más alto
 
-numbers= []
 
-for index in range(10):
-    number = float(input(f'Ingrese el número {index+1}:'))
-    numbers.append(number)
 
-print(f'Los números ingresados son {numbers}')
-    
-
-Longest_Number= max(numbers)
-print(f'El número mayor es: {Longest_Number}')
 
 
 

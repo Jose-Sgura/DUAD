@@ -1,0 +1,28 @@
+1. Cree un algoritmo para ver un video en Youtube. Sea lo más especifico posible.
+    
+    Respuesta: 
+    
+    Inicio
+    
+    1. Encender la computadora
+        1. Digitar sus credenciales de ingreso
+            1. Usuario y contraseña
+            2. PIN
+            3. Huella digital 
+    2. Ir a su buscador de confianza
+        1. Digerirse a barra de tareas
+        2. Dar click sobre el icono del buscador
+            1. mozila
+            2. Firefox
+            3. chrome
+            4. Explorer
+    3. Digitar enlace www.youtube.com
+        1. Click sobre la barra de búsqueda de Youtube
+            1. Digitar nombre de video
+                1. Dar click sobre el video solicitado
+        2. Ajustar el tamaño del video
+            1. FullScreen o normal
+        
+        4. Ver video
+        
+        fin
