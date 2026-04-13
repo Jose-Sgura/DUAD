@@ -1,13 +1,7 @@
 import FreeSimpleGUI as sg
-from csv_manager import save_data, data_load, Expense
+from csv_manager import save_data, data_load
 from datetime import datetime
-def validate_date(date_user):
-    try:
-        datetime.strptime(date_user, "%d/%m/%Y")
-        return True
-    except ValueError:
-        return False
-
+from finance_logic import validate_expense, add_expense, delete_row, filter_my_date, validate_date
 
 def show_third_window():
     list = data_load("expenses.csv")
@@ -22,13 +16,16 @@ def show_third_window():
         category = row[2]
         if category in color_map:
             row_colors.append((i, color_map[category]))
+    if not categories:
+        sg.popup_error("You must create at least one category before adding expenses!")
+        return
 
     layout = [
         [sg.Text("Title"), sg.Input(key="TITLE_ITEM")],
         [sg.Text("Type:"), sg.Combo(category_name, key="TYPE", readonly=True)],
         [sg.Text("Expense:"), sg.Input(key="EXPENSE")],
         [sg.Button("ADD"), sg.Button("DELETE")],
-        [sg.Text("DATE:"), sg.Input(datetime.today().strftime("%d/%m/%Y"), key = "DATE")],
+        [sg.Text("DATE:"), sg.Input(datetime.today().strftime("%d/%m/%Y"), key="DATE")],
         [sg.Text("START DATE"), sg.Input(key="FIRST DATE")],
         [sg.Text("END DATE"), sg.Input(key="LAST DATE")],
         [sg.Button("FILTER")],
@@ -50,15 +47,11 @@ def show_third_window():
             title=values["TITLE_ITEM"]
             type = values["TYPE"]
             expense = values["EXPENSE"]
-            date_input = datetime.strptime(values["DATE"], "%d/%m/%Y")
-            if not title or not type or not expense:
-                sg.popup_error("PLEASE FILL UP THE INFORMATION REQUIRED")
-            elif date_input > datetime.today():
-                sg.popup_error("Date cannot be in the future")
+            valid, error = validate_expense(title, type, expense, values["DATE"])
+            if not valid:
+                sg.popup_error(error)
             else:
-                item = Expense(values["DATE"],title,type, expense)
-                list.append(item.to_row())
-                save_data("expenses.csv", list)
+                list = add_expense(list, values["DATE"], title, type, expense)
 
                 row_colors = []
                 for i, row in enumerate(list):
@@ -76,13 +69,7 @@ def show_third_window():
             if not validate_date(start) or not validate_date(end):
                 sg.popup_error("Format not correct, use dd/mm/yyyy")
             else:
-                start = datetime.strptime(start, "%d/%m/%Y")
-                end = datetime.strptime(end, "%d/%m/%Y")
-                filtered = []
-                for row in list:
-                    register_date = datetime.strptime(row[0], "%d/%m/%Y")
-                    if start <= register_date <= end:
-                        filtered.append(row)
+                filtered = filter_my_date(list, start, end)
                 window["-TABLE-"].update(values=filtered)
         elif event == "-TABLE-":
             picked =  values["-TABLE-"]
@@ -92,8 +79,7 @@ def show_third_window():
                 sg.popup_error("Please pick the row you wanna delete")
             else:
                 index = picked[0]
-                list.pop(index)
-                save_data("expenses.csv", list)
+                list = delete_row(list, index, "expenses.csv")
                 row_colors = []
                 for i, row in enumerate(list):
                     category = row[2]

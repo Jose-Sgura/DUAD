@@ -51,7 +51,6 @@ def export_report(filename):
             writer.writerow([row[0], row[1], row[3], row[2], "", "Expense"])
             total_expenses += float(row[3])
         total_incomes = 0
-        
         for row in incomes:
             writer.writerow([row[0], row[1], row[3],row[2], "", "Income"])
             total_incomes += float(row[3])

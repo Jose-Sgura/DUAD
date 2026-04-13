@@ -1,13 +1,7 @@
 import FreeSimpleGUI as sg
-from csv_manager import save_data, data_load, Income
+from csv_manager import save_data, data_load
 from datetime import datetime
-
-def validate_date(date_user):
-    try:
-        datetime.strptime(date_user, "%d/%m/%Y")
-        return True
-    except ValueError:
-        return False
+from finance_logic import validate_income, add_income, delete_row, filter_my_date, validate_date
 
 def show_fourth_window():
     data = data_load("incomes.csv")
@@ -15,27 +9,31 @@ def show_fourth_window():
     color_map = {}
     for row in categories:
         color_map[row[0]] = row[1]
-    
+
     category_name = [row[0] for row in categories]
-    
+
     row_colors = []
     for i, row in enumerate(data):
         category = row[2]
         if category in color_map:
             row_colors.append((i, color_map[category]))
-    
+
+    if not categories:
+        sg.popup_error("You must create at least one category before adding incomes!")
+        return
+
     layout = [
         [sg.Text("Title"), sg.Input(key="TITLE_ITEM")],
-        [sg.Text("Category"), sg.Combo(category_name,key="CATE",readonly=True)],
+        [sg.Text("Category"), sg.Combo(category_name, key="CATE", readonly=True)],
         [sg.Text("Income"), sg.Input(key="ADDS")],
-        [sg.Button("ADD"),sg.Button("DELETE")],
-        [sg.Text("DATE:"), sg.Input(datetime.today().strftime("%d/%m/%Y"), key = "DATE")],
+        [sg.Button("ADD"), sg.Button("DELETE")],
+        [sg.Text("DATE:"), sg.Input(datetime.today().strftime("%d/%m/%Y"), key="DATE")],
         [sg.Text("START DATE"), sg.Input(key="FIRST DATE")],
         [sg.Text("END DATE"), sg.Input(key="LAST DATE")],
         [sg.Button("FILTER")],
-        [sg.Table(values=data, headings=["DATE","TITLE","CATEGORY", "INCOMES"],
+        [sg.Table(values=data, headings=["DATE", "TITLE", "CATEGORY", "INCOMES"],
             key="-TABLE-", size=(40, 10),
-            col_widths=[12,12, 12, 12],
+            col_widths=[12, 12, 12, 12],
             auto_size_columns=False, row_colors=row_colors)]
     ]
 
@@ -51,16 +49,11 @@ def show_fourth_window():
             title = values["TITLE_ITEM"]
             cat = values["CATE"]
             inc = values["ADDS"]
-            date_input = datetime.strptime(values["DATE"], "%d/%m/%Y")
-            if not title or not cat or not inc:
-                sg.popup_error("PLEASE FILL UP THE INFORMATION REQUIRED")
-            elif date_input > datetime.today():
-                sg.popup_error("Date cannot be in the future")
-            
+            valid, error = validate_income(title, cat, inc, values["DATE"])
+            if not valid:
+                sg.popup_error(error)
             else:
-                item = Income(values["DATE"],title,cat, inc)
-                data.append(item.to_row())
-                save_data("incomes.csv", data)
+                data = add_income(data, values["DATE"], title, cat, inc)
 
                 row_colors = []
                 for i, row in enumerate(data):
@@ -77,31 +70,22 @@ def show_fourth_window():
             if not validate_date(start) or not validate_date(end):
                 sg.popup_error("Format not correct, use dd/mm/yyyy")
             else:
-                start = datetime.strptime(start, "%d/%m/%Y")
-                end = datetime.strptime(end, "%d/%m/%Y")
-                filtered = []
-                for row in data:
-                    register_date = datetime.strptime(row[0], "%d/%m/%Y")
-                    if start <= register_date <= end:
-                        filtered.append(row)
+                filtered = filter_my_date(data, start, end)
                 window["-TABLE-"].update(values=filtered)
         elif event == "-TABLE-":
-            picked =  values["-TABLE-"]
+            picked = values["-TABLE-"]
         elif event == "DELETE":
-            picked =  values["-TABLE-"]
+            picked = values["-TABLE-"]
             if not picked:
                 sg.popup_error("Please pick the row you wanna delete")
             else:
                 index = picked[0]
-                data.pop(index)
-                save_data("incomes.csv", data)
-
+                data = delete_row(data, index, "incomes.csv")
                 row_colors = []
                 for i, row in enumerate(data):
                     category = row[2]
                     if category in color_map:
                         row_colors.append((i, color_map[category]))
-                window["-TABLE-"].update(values = data, row_colors=row_colors)
-
+                window["-TABLE-"].update(values=data, row_colors=row_colors)
 
     window.close()
