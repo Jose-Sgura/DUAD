@@ -1,8 +1,8 @@
-#se actuliza tabla prouducts para dejar stock en 1 y version también.
+--se actuliza tabla prouducts para dejar stock en 1 y version también.
 UPDATE products SET stock = 1, version = 1 WHERE id = 1;
 
-#se agrega columna version a la tabla producto
-#para llevar un indicador de cambio
+--se agrega columna version a la tabla producto
+--para llevar un indicador de cambio
 ALTER TABLE products 
 ADD COLUMN version in DEFAULT 1;
 
@@ -35,7 +35,7 @@ BEGIN
     VALUES (v_user_id, 0.00, 'pending')
     RETURNING id INTO v_bill_id;
 
-#Use una transacción que lea el stock y actualice solo si el stock no cambió en el proceso
+--Use una transacción que lea el stock y actualice solo si el stock no cambió en el proceso
     
     UPDATE products
     SET stock   = stock - v_quantity,
@@ -46,7 +46,7 @@ BEGIN
 
     GET DIAGNOSTICS v_rows_updated = ROW_COUNT;
 
-#Si otro proceso modificó el stock mientras tanto, debe abortar la compra
+--Si otro proceso modificó el stock mientras tanto, debe abortar la compra
     IF v_rows_updated = 0 THEN
         RAISE EXCEPTION 'Aborted buy, another process modified the stock from product %', v_product_id;
     END IF;
