@@ -4,7 +4,7 @@ UPDATE products SET stock = 1, version = 1 WHERE id = 1;
 --se agrega columna version a la tabla producto
 --para llevar un indicador de cambio
 ALTER TABLE products 
-ADD COLUMN version in DEFAULT 1;
+ADD COLUMN version INT DEFAULT 1;
 
 DO $$
 DECLARE
