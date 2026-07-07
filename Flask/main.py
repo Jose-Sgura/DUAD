@@ -29,10 +29,10 @@ def get_jobs():
         jobs = [j for j in jobs if j["status"]== filter_status]
     return jsonify(jobs), 200
 
-@app.route("/jobs/<int:id>", methods=["GET"])
-def get_job(id):
+@app.route("/jobs/<int:job_id>", methods=["GET"])
+def get_job(job_id):
     jobs = read_jobs()
-    job = next((j for j in jobs if j["id"]==id), None)
+    job = next((j for j in jobs if j["id"]==job_id), None)
     if job is None:
         return jsonify({"error":"Job was not found"}),404
     return jsonify(job),200
@@ -47,7 +47,7 @@ def make_job():
     
     new_id = data.get("id")
     if new_id is None:
-        return jsonify({"error":"The identifier is a must"})
+        return jsonify({"error":"The identifier is a must"}), 400
     if any(j["id"]== new_id for j in jobs):
         return jsonify({"error":f"The job with the identifier {new_id} already exists"}),400
     
@@ -72,10 +72,10 @@ def make_job():
     write_jobs(jobs)
 
     return jsonify(new_job),201
-@app.route("/jobs/<int:id>", methods = ["PUT"])
-def update_jobs(id):
+@app.route("/jobs/<int:job_id>", methods = ["PUT"])
+def update_jobs(job_id):
     jobs = read_jobs()
-    job = next((j for j in jobs if j["id"]==id), None)
+    job = next((j for j in jobs if j["id"]==job_id), None)
 
     if job is None:
         return jsonify({"error":"The jobs is not found"}), 404
@@ -91,7 +91,10 @@ def update_jobs(id):
     
     if "description" in data:
         if not data["description"]:
-            return({"error":"Description cannot be empty"}),400
+            #la versión más nueva de Flask no muestra ningún error al convertirlo a JSON,
+            #de manera automatica lo transforma en JSON
+            #sin embargo es necesario el jsonify para que se muestre el mensaje de error en el navegador sin importar que versión usé quien lo llame
+            return jsonify({"error":"Description cannot be empty"}),400
         job["description"] = data ["description"]
     
     if "status" in data:
@@ -104,17 +107,17 @@ def update_jobs(id):
     write_jobs(jobs)
     return jsonify(job),200
 
-@app.route("/jobs/<int:id>", methods = ["DELETE"])
-def delete_job(id):
+@app.route("/jobs/<int:job_id>", methods = ["DELETE"])
+def delete_job(job_id):
     jobs = read_jobs()
-    job = next((j for j in jobs if j["id"]== id), None)
+    job = next((j for j in jobs if j["id"]== job_id), None)
 
     if job is None:
         return jsonify({"error": "The job was not found"}),404
-    updated_jobs = [j for j in jobs if j["id"]!=id]
+    updated_jobs = [j for j in jobs if j["id"]!=job_id]
     write_jobs(updated_jobs)
 
-    return jsonify({"message":f"The job {id} deleted correctly"}),200
+    return jsonify({"message":f"The job {job_id} deleted correctly"}),200
         
 
 if __name__ == "__main__":

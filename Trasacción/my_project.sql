@@ -10,7 +10,7 @@ END IF;
 
 UPDATE products
 SET stock = stock + bi.quantity
-FROM bill_items bi
+FROM bill_item bi
 WHERE products.id = bi.product_id
 AND bi.bill_id = v_bill_id;
 
@@ -21,8 +21,8 @@ WHERE id = v_bill_id;
 RAISE NOTICE 'Returning proceed succesfully for the invoice %', v_bill_id;
 
 EXCEPTION
-    WHEN OTHER THEN 
-        RAISE NOTICE 'Transaction failed: %', SQLERRM;
+    WHEN OTHERS THEN 
+        RAISE EXCEPTION 'Transaction failed: %', SQLERRM;
 
 END; $$ language plpgsql;
 
