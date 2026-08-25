@@ -20,22 +20,18 @@ def check_available_cars(db_manager):
     return count
 
 def run_health_check():
-    try:
-        db_manager = PgManager(
-            db_name="postgres",
-            user="postgres",
-            password="tu_nueva_contraseña",
-            host="localhost",
-        )
-    except Exception as error:
-        print("DB ERROR. It could not connect to the data base")
-        print   (f"Detail {error}")
-        return
     
+    db_manager = PgManager(
+        db_name="postgres",
+        user="postgres",
+        password="tu_nueva_contraseña",
+        host="localhost"
+    )
+
     if not db_manager.connection:
         print("DB ERROR. It could not connect to the data base ")
         return
-    missing= check_tables_exist(db_manager)
+    missing = check_tables_exist(db_manager)
     if missing:
         print(f"DB ERROR. Missing tables_ {' , '.join(missing)}")
         db_manager.close_connection()
@@ -45,9 +41,10 @@ def run_health_check():
         print("DB ERROR. There are not enable cars")
         db_manager.close_connection()
         return
-    
+
     print("DB OK. System working as usual ")
     db_manager.close_connection()
+
 
 if __name__ == "__main__":
     run_health_check()

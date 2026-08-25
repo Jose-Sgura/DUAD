@@ -22,7 +22,7 @@ def backup_table(db_manager, table_name, today_str):
         writer.writerow(column_names)
         writer.writerows(rows)
     
-    print({f"Backup of {table_name} saved in: {file_path}({len(rows)} rows)"})
+    print(f"Backup of '{table_name}' saved in: {file_path}({len(rows)} rows)")
 
 def run_backup():
     os.makedirs(BACKUP_FOLDER, exist_ok = True)
