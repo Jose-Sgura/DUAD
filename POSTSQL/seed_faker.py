@@ -34,7 +34,7 @@ def seed_users(db_manager, count):
         result = db_manager.execute_query(
             "INSERT INTO lyfter_car_rental.users "
             "(full_name, email, user_name, password, birth_date, status) "
-            "VALUES (%s, %s, %s, %s, %s, %s,) RETURNING id;",
+            "VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;",
 
             full_name, email, user_name, password, birth_date, status
             )
@@ -73,6 +73,7 @@ def seed_rentals(db_manager, user_ids, auto_ids):
         db_manager.execute_query(
             "INSERT INTO lyfter_car_rental.rent (user_id, auto_id, status) "
             "VALUES (%s, %s, %s);",
+            user_id, auto_id, status,
             )
         created+=1
     print(f"{created} created rents")
