@@ -1,7 +1,8 @@
 import random
 from faker import Faker
 from db import verify_create_tables, get_session
-from manager import User_Manager, Automobile_Manager, Address_Manager
+from manager import UserManager, AutomobileManager, AddressManager
+from models import Address, Automobile, User
 
 fake = Faker("en_US")
 
@@ -19,12 +20,19 @@ MODEL_BRANDS = [
 def generate_plate():
     return fake.unique.bothify(text = '???-###').upper()
 
+def clean_data(session):
+    session.query(Address).delete()
+    session.query(Automobile).delete()
+    session.query(User).delete()
+    session.commit()
+
 def populate(user_amount = 20, car_withno_owner = 5):
     verify_create_tables()
     session = get_session()
-    users = User_Manager(session)
-    cars = Automobile_Manager(session)
-    addresses = Address_Manager(session)
+    clean_data(session)
+    users = UserManager(session)
+    cars = AutomobileManager(session)
+    addresses = AddressManager(session)
 
     for _ in range(user_amount):
         user = users.create_user(

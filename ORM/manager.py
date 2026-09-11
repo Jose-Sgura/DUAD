@@ -1,6 +1,7 @@
 from models import User, Address, Automobile
+from sqlalchemy import func
 
-class User_Manager:
+class UserManager:
     def __init__(self, session):
         self.session = session
     
@@ -15,7 +16,10 @@ class User_Manager:
         user = self.session.get(User, user_id)
         if user is None:
             return None
+        valid_fields = User.__table__.columns.keys()
         for field, value in changes.items():
+            if field not in valid_fields:
+                raise ValueError(f"'{field}' is not a valid field of User")
             setattr(user, field, value)
         self.session.commit()
         self.session.refresh(user)
@@ -25,14 +29,6 @@ class User_Manager:
         user = self.session.get(User, user_id)
         if user is None:
             return False
-        addresses = self.session.query(Address).filter_by(user_id = user_id).all()
-        for address in addresses:
-            self.session.delete(address)
-        
-        automobiles = self.session.query(Automobile).filter_by(user_id = user_id).all()
-        for automobile in automobiles:
-            automobile.user_id = None
-        
         self.session.delete(user)
         self.session.commit()
         return True
@@ -42,10 +38,16 @@ class User_Manager:
     def query_all(self):
         return self.session.query(User).all()
     
-    def get_with_more_than_n_car(self):
-        return [user for user in self.session.query(User) if len(user.autos)> 1]
+    def get_with_more_than_n_car(self, n = 1):
+        return (
+            self.session.query(User)
+            .join(Automobile, Automobile.user_id == User.id)
+            .group_by(User.id)
+            .having(func.count(Automobile.id) > n)
+            .all()
+        )
 
-class Automobile_Manager:
+class AutomobileManager:
     def __init__(self, session):
         self.session = session
     
@@ -61,7 +63,10 @@ class Automobile_Manager:
         automobile = self.session.get(Automobile, automobile_id)
         if automobile is None:
             return None
+        valid_fields = Automobile.__table__.columns.keys()
         for field, value in changes.items():
+            if field not in valid_fields:
+                raise ValueError(f"'{field}' is not a valid field of Automobile")
             setattr(automobile, field, value)
         self.session.commit()
         self.session.refresh(automobile)
@@ -98,7 +103,7 @@ class Automobile_Manager:
     def get_with_no_owner(self):
         return self.session.query(Automobile).filter(Automobile.user_id.is_(None)).all()
     
-class Address_Manager:
+class AddressManager:
     def __init__(self, session):
         self.session = session
 
@@ -117,7 +122,10 @@ class Address_Manager:
         address = self.session.get(Address, address_id)
         if address is None:
             return None
+        valid_fields = Address.__table__.columns.keys()
         for field, value in changes.items():
+            if field not in valid_fields:
+                raise ValueError(f"'{field}' is not a valid field of address")
             setattr(address, field, value)
         self.session.commit()
         self.session.refresh(address)

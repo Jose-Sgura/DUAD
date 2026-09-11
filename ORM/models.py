@@ -11,7 +11,7 @@ class User(Base):
     email = Column(String(120), nullable = False, unique = True)
     phone = Column(String(20), nullable = True)
 
-    autos = relationship("Automobile", back_populates = "user")
+    cars = relationship("Automobile", back_populates = "user")
     addresses = relationship(
         "Address", back_populates = "user", cascade = "all, delete-orphan"
         )
@@ -41,7 +41,7 @@ class Automobile(Base):
     year = Column(Integer, nullable = True)
     plate = Column(String(20), nullable = False, unique = True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable = True)
-    user = relationship("User", back_populates = "autos")
+    user = relationship("User", back_populates = "cars")
     
     def __repr__(self):
         return ( f"<Automobile id = {self.id} brand = {self.brand!r} model = {self.model!r}, " 

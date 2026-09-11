@@ -1,5 +1,5 @@
 from db import test_connection, verify_create_tables, get_session
-from manager import User_Manager, Automobile_Manager, Address_Manager
+from manager import UserManager, AutomobileManager, AddressManager
 
 def line(title:str)-> None:
     print("\n" + "-" *60)
@@ -13,9 +13,9 @@ def main()->None:
     # Validar/crear tablas (Ejercicio 3)
     verify_create_tables()
     session = get_session()
-    users= User_Manager(session)
-    cars = Automobile_Manager(session)
-    addresses = Address_Manager(session)
+    users= UserManager(session)
+    cars = AutomobileManager(session)
+    addresses = AddressManager(session)
 
     #Crear usuarios
     line("Creating users")
@@ -43,7 +43,7 @@ def main()->None:
 
     #Asociar el automovil huerfano a un usuario
     line("Afiliating car with no owner to Benjamin")
-    car_no_owner = cars.modify_automobile(car_no_owner.id, user_id = benjamin.id)
+    car_no_owner = cars.affiliate_user(car_no_owner.id, benjamin.id)
     print(car_no_owner)
     
     #modificar datos existentes
