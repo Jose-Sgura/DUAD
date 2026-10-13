@@ -2,7 +2,7 @@ import datetime
 
 import jwt
 
-class JWT_Manager:
+class JWTManager:
     def __init__(self, private_key, public_key, algorithm="RS256"):
         self.private_key = private_key
         self.public_key = public_key

@@ -9,12 +9,12 @@ from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerifyMismatchError
 
 
-from auth import login_required
-from db import DB_Manager
-from JWT_Manager import JWT_Manager
+from auth import authenticate_request, login_required
+from db import DBManager
+from JWT_Manager import JWTManager
 
 app = Flask("fruit-store")
-db_manager = DB_Manager()
+db_manager = DBManager()
 ph= PasswordHasher()
 
 KEYS_DIR = os.environ.get("JWT_KEYS_DIR", os.path.join(os.path.dirname(__file__), "keys"))
@@ -23,7 +23,7 @@ with open(os.path.join(KEYS_DIR, "private.pem"), "rb") as f:
 with open(os.path.join(KEYS_DIR,"public.pem"), "rb") as f:
     PUBLIC_KEY = f.read() 
 
-jwt_manager = JWT_Manager(PRIVATE_KEY, PUBLIC_KEY, "RS256")
+jwt_manager = JWTManager(PRIVATE_KEY, PUBLIC_KEY, "RS256")
 
 app.config["DB_MANAGER"] = db_manager
 app.config["JWT_MANAGER"] = jwt_manager
@@ -75,21 +75,12 @@ def register():
         except Exception:
             return jsonify(error = "internal server error"), 500
         if existing_admins > 0:
-            auth_header = request.headers.get("Authorization")
-            if not auth_header:
-                return jsonify(error = "Only an admin can create another admin"), 403
-        
-            token= auth_header.replace("Bearer ", "",1)
-            try:
-                decoded = jwt_manager.decode(token)
-            except Exception:
-                return jsonify(error = "Invalid or expired token"), 401
-            if not decoded or decoded.get("type") != "access":
-                return jsonify(error = "Invalid or expired token"),401
-        
-            requester = db_manager.get_user_by_id(decoded.get("id"))
-            if not requester or requester.role!= "admin":
+            requester, error = authenticate_request()
+            if error is not None:
+                return error
+            if requester.role != "admin":
                 return jsonify(error="Only an admin can create another admin"), 403
+        
     try:
         existing = db_manager.get_user_by_username(username)
         if existing is not None:

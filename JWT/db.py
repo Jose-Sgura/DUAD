@@ -27,7 +27,7 @@ product_table = Table(
     Column("quantity", Integer, nullable = False),
 )
 
-Invoice_table = Table(
+invoice_table = Table(
     "invoices",
     metadata_obj,
     Column("id", Integer, primary_key = True),
@@ -36,7 +36,7 @@ Invoice_table = Table(
     Column("total", Float, nullable=False)
 )
 
-Invoice_item_table = Table(
+invoice_item_table = Table(
     "invoice_items",
     metadata_obj,
     Column("id", Integer, primary_key=True),
@@ -66,7 +66,7 @@ login_history_table = Table(
     Column("success", Boolean, nullable=False),
 )
 
-class DB_Manager:
+class DBManager:
     def __init__(self, connection_string=None):
         connection_string = connection_string or os.environ.get(
             "DATABASE_URL",
@@ -170,15 +170,15 @@ class DB_Manager:
                 }
                 )
             invoice_stmt = (
-                insert(Invoice_table)
-                .returning(Invoice_table.c.id)
+                insert(invoice_table)
+                .returning(invoice_table.c.id)
                 .values(user_id = user_id, date= datetime.now(timezone.utc), total = total)
             )
             invoice_id = conn.execute(invoice_stmt).all()[0][0]
 
             for ri in resolved_items:
                 conn.execute(
-                    insert(Invoice_item_table).values(
+                    insert(invoice_item_table).values(
                         invoice_id = invoice_id,
                         product_id = ri["product_id"],
                         quantity = ri["quantity"],
@@ -193,17 +193,23 @@ class DB_Manager:
             conn.commit()
             return{"id": invoice_id, "total": total, "items": resolved_items}
     def get_invoices_by_user(self, user_id):
-        stmt = select(Invoice_table).where(Invoice_table.c.user_id == user_id)
+        invoices_stmt = select(invoice_table).where(invoice_table.c.user_id == user_id).order_by(invoice_table.c.id)
         with self.engine.connect() as conn:
-            invoices = conn.execute(stmt).all()
-            result = []
-            for inv in invoices:
-                items_stmt = select(Invoice_item_table).where(
-                    Invoice_item_table.c.invoice_id == inv.id
-                )
-                items = conn.execute(items_stmt).all()
-                result.append({"invoice": inv, "items": items})
-            return result
+            invoices = conn.execute(invoices_stmt).all()
+            if not invoices:
+                return []
+            invoice_ids = [inv.id for inv in invoices]
+            items_stmt = select(invoice_item_table).where(invoice_item_table.c.invoice_id.in_(invoice_ids)).order_by(invoice_item_table.c.id)
+            items = conn.execute(items_stmt).all()
+
+        items_by_invoice = {}
+        for item in items:
+            items_by_invoice.setdefault(item.invoice_id, []).append(item)
+        return [
+            {"invoice": inv, "items": items_by_invoice.get(inv.id, [])}
+            for inv in invoices
+        ]
+
     def create_contact(self, user_id, name, phone, email):
         stmt = (
             insert(contact_table)
