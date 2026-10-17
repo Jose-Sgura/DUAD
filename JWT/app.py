@@ -9,7 +9,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerifyMismatchError
 
 
-from auth import authenticate_request, login_required
+from auth import authenticate_request, login_required, get_bearer_token
 from db import DBManager
 from JWT_Manager import JWTManager
 
@@ -131,11 +131,7 @@ def login():
 @app.route("/refresh-token", methods=["POST"])
 def refresh_token():
     data = request.get_json(silent=True) or {}
-    token = data.get("refresh_token")
-    if not token:
-        auth_header = request.headers.get("Authorization")
-        if auth_header:
-            token = auth_header.replace("Bearer ", "", 1)
+    token = data.get("refresh_token") or get_bearer_token()
     if not token:
         return jsonify(error = "refresh_token is required"), 400
     try:

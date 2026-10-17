@@ -3,7 +3,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 from sqlalchemy import Table, Column, Integer, String, Float, Date, DateTime, Boolean, ForeignKey
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy import insert, select, update, delete, func
 from datetime import datetime,timezone
 
 metadata_obj = MetaData()
@@ -102,9 +102,9 @@ class DBManager:
             rows = conn.execute(stmt).all()
             return rows[0] if rows else None
     def count_admins(self):
-        stmt = select(user_table).where(user_table.c.role == "admin")
+        stmt = select(func.count())(user_table).where(user_table.c.role == "admin")
         with self.engine.connect() as conn:
-            return len(conn.execute(stmt).all())
+            return conn.execute(stmt).scalar_one()
 #products
 
     def create_product(self, name, price, entry_date, quantity):

@@ -3,7 +3,7 @@ import functools
 import jwt as pyjwt
 from flask import current_app, g, jsonify, request
 
-def _get_bearer_token():
+def get_bearer_token():
     auth_header = request.headers.get("Authorization")
     if not auth_header:
         return None
