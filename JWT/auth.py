@@ -14,7 +14,7 @@ def authenticate_request():
     jwt_manager = current_app.config["JWT_MANAGER"]
     db_manager = current_app.config["DB_MANAGER"]
 
-    token = _get_bearer_token()
+    token = get_bearer_token()
     if token is None:
         return None, (jsonify(error = "Missing authorization token"), 401)
     try:
