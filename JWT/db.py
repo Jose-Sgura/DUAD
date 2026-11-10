@@ -102,7 +102,7 @@ class DBManager:
             rows = conn.execute(stmt).all()
             return rows[0] if rows else None
     def count_admins(self):
-        stmt = select(func.count())(user_table).where(user_table.c.role == "admin")
+        stmt = select(func.count()).select_from(user_table).where(user_table.c.role == "admin")
         with self.engine.connect() as conn:
             return conn.execute(stmt).scalar_one()
 #products
@@ -227,11 +227,13 @@ class DBManager:
             stmt = stmt.where(contact_table.c.user_id == user_id)
         with self.engine.connect() as conn:
             return conn.execute(stmt).all()
+        
     def get_contact_by_id(self, contact_id):
         stmt = select(contact_table).where(contact_table.c.id == contact_id)
         with self.engine.connect() as conn:
             rows = conn.execute(stmt).all()
             return rows[0] if rows else None
+        
     def update_contact(self, contact_id, **fields):
         fields = {k: v for k, v in fields.items() if v is not None}
         if not fields:
@@ -241,12 +243,14 @@ class DBManager:
             conn.execute(stmt)
             conn.commit()
         return self.get_contact_by_id(contact_id)
+    
     def delete_contact(self, contact_id):
         stmt = delete(contact_table).where(contact_table.c.id == contact_id)
         with self.engine.connect() as conn:
             result = conn.execute(stmt)
             conn.commit()
             return result.rowcount > 0
+        
     def insert_login_history(self, user_id, username,ip_address, success):
         stmt = insert(login_history_table).values(
             user_id = user_id,

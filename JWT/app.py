@@ -10,12 +10,19 @@ from argon2.exceptions import InvalidHashError, VerifyMismatchError
 
 
 from auth import authenticate_request, login_required, get_bearer_token
+from cache_manager import CacheManager
 from db import DBManager
 from JWT_Manager import JWTManager
 
 app = Flask("fruit-store")
 db_manager = DBManager()
 ph= PasswordHasher()
+cache_manager = CacheManager()
+if cache_manager.ping():
+    print("Connected to Redis")
+else:
+    print("Redis is not available, caching is disabled")
+
 
 KEYS_DIR = os.environ.get("JWT_KEYS_DIR", os.path.join(os.path.dirname(__file__), "keys"))
 with open(os.path.join(KEYS_DIR, "private.pem"), "rb") as f:
@@ -196,6 +203,13 @@ def _serialize_product(p):
         "entry_date": p.entry_date.isoformat(),
         "quantity": p.quantity,
     }
+def _fruit_cache_key(product_id):
+    return f"fruit:{product_id}"
+FRUITS_ALL_KEY = "fruits:all"
+
+def _invalidate_fruit_cache(*product_ids):
+    keys = [_fruit_cache_key(pid) for pid in product_ids] + [FRUITS_ALL_KEY]
+    cache_manager.delete(*keys)
 
 @app.route("/products", methods=["POST"])
 @login_required(roles=["admin"])
@@ -220,22 +234,41 @@ def create_product():
         return jsonify(error = "price and quantity must not be negative"), 400
     try:
         new_id = db_manager.create_product(name, price, entry_date_parsed, quantity)[0]
+        _invalidate_fruit_cache(new_id)
         product = db_manager.get_product_by_id(new_id)
         return jsonify(_serialize_product(product)),201
     except Exception:
         return jsonify(error = "Internal server error"), 500
+    
 @app.route("/products", methods = ["GET"])
 @login_required(roles=["admin"])
 def list_products():
+    cached = cache_manager.get(FRUITS_ALL_KEY)
+    if cached is not None:
+        response = jsonify(cached)
+        response.headers["X-Cache"] = "HIT"
+        return response, 200
+    
     try:
         products = db_manager.get_products()
-        return jsonify([_serialize_product(p) for p in products]),200
     except Exception:
-        return jsonify(error="Internal server error"),500
+        return jsonify(error = "Internal server error"), 500
+    data = [_serialize_product(p) for p in products]
+    cache_manager.set(FRUITS_ALL_KEY, data)
+    response = jsonify(data)
+    response.headers["X-Cache"] = "MISS"
+    return response, 200
+
     
 @app.route("/products/<int:product_id>", methods = ["GET"])
 @login_required(roles=["admin"])
 def get_product(product_id):
+    key = _fruit_cache_key(product_id)
+    cached = cache_manager.get(key, refresh_ttl = True)
+    if cached is not None:
+        response = jsonify(cached)
+        response.headers["X-Cache"] = "HIT"
+        return response, 200
     try:
         product = db_manager.get_product_by_id(product_id)
     except Exception:
@@ -243,7 +276,11 @@ def get_product(product_id):
     if product is None:
         return jsonify(error="Product not found"), 404
     
-    return jsonify(_serialize_product(product)), 200
+    data = _serialize_product(product)
+    cache_manager.set(key,data)
+    response = jsonify(data)
+    response.headers["X-Cache"] = "MISS"
+    return response, 200
 
 @app.route("/products/<int:product_id>", methods = ["PUT"])
 @login_required(roles=["admin"])
@@ -276,6 +313,7 @@ def update_product(product_id):
     
     try:
         updated = db_manager.update_product(product_id, **fields)
+        _invalidate_fruit_cache(product_id)
         return jsonify(_serialize_product(updated)),200
     except Exception:
         return jsonify(error = "Internal server error"), 500
@@ -288,6 +326,7 @@ def delete_product(product_id):
         if existing is None:
             return jsonify(error = "Product not found"), 404
         db_manager.delete_product(product_id)
+        _invalidate_fruit_cache(product_id)
         return "", 204
     except Exception:
         return jsonify(error = "Internal server error"), 500
@@ -323,9 +362,13 @@ def purchase():
             return jsonify(error = "quantity must be greater than 0"), 400
         
         parsed_items.append({"product_id": product_id, "quantity": quantity})
-
+    merged = {}
+    for it in parsed_items:
+        merged[it["product_id"]] = merged.get(it["product_id"], 0) + it["quantity"]
+    parsed_items = [{"product_id":pid, "quantity": qty} for pid, qty in merged.items()]
     try:
         invoice = db_manager.create_invoice_with_items(g.user_id, parsed_items)
+        _invalidate_fruit_cache(*(item["product_id"] for item in parsed_items))
         return(
             jsonify(
                 id=invoice["id"],
