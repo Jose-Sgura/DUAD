@@ -70,7 +70,7 @@ class DBManager:
     def __init__(self, connection_string=None):
         connection_string = connection_string or os.environ.get(
             "DATABASE_URL",
-            "postgresql+psycopg2://postgres:FrutasTienda123@localhost:5432/postgres",
+            "postgresql+psycopg2://postgres:PLACEHOLDER@localhost:5432/postgres",
 
         )
         self.engine = create_engine(connection_string)

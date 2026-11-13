@@ -11,5 +11,5 @@ auth.py	Validación del token y decorador login_required
 db.py	Tablas y DBManager (acceso a la base de datos)
 JWT_Manager.py	JWTManager para crear y verificar tokens
 cache_manager.py	CacheManager: capa de caché sobre Redis (get / set / delete)
-docker-compose.yml	Levanta una instancia de Redis
+docker-compose.yml	(se me olvidó quitarlo anteriormente, pensé en usarlo pero preferí hacerlo desde la nube como se nos enseñó)
 generate_keys.py	Genera el par de llaves RSA
